@@ -146,4 +146,22 @@ $(function() {
     $('#step1, #step2').hide();
     $('#step3').show();
   }
+
+  $("form").on("submit", function(ev) {
+
+    ev.preventDefault();
+
+    var $input = $(this).find("input[type=text]");
+    var data = $input.val();
+    $input.val("");
+
+    $("#message").append(data + "<br>");
+
+    multiparty.send(data);
+
+  });
+
+  multiparty.on('message', function(mesg) {
+    $("#message").append(mesg.data + "<br>");
+  });
 });
