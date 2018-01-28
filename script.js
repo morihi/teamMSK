@@ -118,50 +118,49 @@ $(function() {
   }
 
   function step3(room) {
-    // Wait for stream on the call, then set peer video display
-    room.on('stream', stream => {
-      const peerId = stream.peerId;
-      const id = 'video_' + peerId + '_' + stream.id.replace('{', '').replace('}', '');
+      // Wait for stream on the call, then set peer video display
+      room.on('stream', stream => {
+          const peerId = stream.peerId;
+          const id = 'video_' + peerId + '_' + stream.id.replace('{', '').replace('}', '');
 
-      $('#their-videos').append($(
-        '<div class="video_' + peerId +'" id="' + id + '">' +
-          '<label>' + stream.peerId + ':' + stream.id + '</label>' +
-          '<video class="remoteVideos" autoplay playsinline>' +
-        '</div>'));
-      const el = $('#' + id).find('video').get(0);
-      el.srcObject = stream;
-      el.play();
-    });
+          $('#their-videos').append($(
+              '<div class="video_' + peerId + '" id="' + id + '">' +
+              '<label>' + stream.peerId + ':' + stream.id + '</label>' +
+              '<video class="remoteVideos" autoplay playsinline>' +
+              '</div>'));
+          const el = $('#' + id).find('video').get(0);
+          el.srcObject = stream;
+          el.play();
+      });
 
-    room.on('removeStream', stream => {
-      const peerId = stream.peerId;
-      $('#video_' + peerId + '_' + stream.id.replace('{', '').replace('}', '')).remove();
-    });
+      room.on('removeStream', stream => {
+          const peerId = stream.peerId;
+          $('#video_' + peerId + '_' + stream.id.replace('{', '').replace('}', '')).remove();
+      });
 
-    // UI stuff
-    room.on('close', step2);
-    room.on('peerLeave', peerId => {
-      $('.video_' + peerId).remove();
-    });
-    $('#step1, #step2').hide();
-    $('#step3').show();
+      // UI stuff
+      room.on('close', step2);
+      room.on('peerLeave', peerId => {
+          $('.video_' + peerId).remove();
+      });
+      $('#step1, #step2').hide();
+      $('#step3').show();
+
+      $('#send').on('submit', e => {
+          e.preventDefault();
+          const msg = $('#text').val();
+          room.send(msg);
+          $('.chat').append($('<div="chat_message"><span>'+peer.id+'</span> : <span>'+msg+'</span><br>'));
+          console.log(msg)
+      });
+      room.on('data', msg =>{
+        $('.chat').append($('<div="chat_message"><span>'+msg.src+'</span> : <span>'+msg.data+'</span><br>'));
+
+      });
   }
 
-  $("form").on("submit", function(ev) {
 
-    ev.preventDefault();
 
-    var $input = $(this).find("input[type=text]");
-    var data = $input.val();
-    $input.val("");
+ });
 
-    $("#message").append(data + "<br>");
 
-    multiparty.send(data);
-
-  });
-
-  multiparty.on('message', function(mesg) {
-    $("#message").append(mesg.data + "<br>");
-  });
-});
